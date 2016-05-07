@@ -1,6 +1,7 @@
-The MIT License (MIT)
+MIT License
+===========
 
-Copyright (c) 2016 Benjamin
+Copyright (c) 2016 Benjamin Leuckefeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
