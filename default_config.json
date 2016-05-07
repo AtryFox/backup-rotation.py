@@ -1,0 +1,18 @@
+{
+  "default": {
+    "create_backup_day_of_week": 0,
+    "create_backup_day_of_month": 0,
+    "create_backup_day_of_year": 0,
+    "daily_backups": 7,
+    "weekly_backups": 4,
+    "monthly_backups": 6,
+    "yearly_backups": 4,
+    "compression": "bz2"
+  },
+  "backup_items": [
+    {
+      "source": "PATH_TO_SOURCE",
+      "destination": "PATH_TO_DESTINATION"
+    }
+  ]
+}
