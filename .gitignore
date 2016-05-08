@@ -7,3 +7,4 @@
 # Test files
 test_config.json
 *.tar.*
+test/

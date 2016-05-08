@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import re
+import tarfile
 from datetime import datetime
 
 
@@ -23,12 +24,45 @@ def main():
 
     now = datetime.now()
 
-    # Start rotation for every backupitem
+    # Start rotation for every backup item
     for backup_item in config_data.backup_items:
-        # TODO: Create daily backup if necessary
-        # TODO: Create weekly backup if necessary
-        # TODO: Create monthly backup if necessary
-        # TODO: Create yearly backup if necessary
+        if backup_item.compression == "bz2":
+            file_type = ".tar.bz2"
+        else:
+            file_type = ".tar.gz"
+
+        file_prefix = now.strftime("%Y-%m-%d")
+
+        if backup_item.daily_backups > 0:
+            file_name = file_prefix + "-DAILY" + file_type
+            if os.path.exists(file_name):
+                print("%s already exists. Skipping..." % file_name)
+            else:
+                create_backup(backup_item, file_name)
+
+        if backup_item.weekly_backups > 0:
+            if now.weekday() == backup_item.create_backup_day_of_week:
+                file_name = file_prefix + "-WEEKLY" + file_type
+                if os.path.exists(file_name):
+                    print("%s already exists. Skipping..." % file_name)
+                else:
+                    create_backup(backup_item, file_name)
+
+        if backup_item.monthly_backups > 0:
+            if now.day == backup_item.create_backup_day_of_month:
+                file_name = file_prefix + "-MONTHLY" + file_type
+                if os.path.exists(file_name):
+                    print("%s already exists. Skipping..." % file_name)
+                else:
+                    create_backup(backup_item, file_name)
+
+        if backup_item.yearly_backups > 0:
+            if now.timetuple().tm_yday == backup_item.create_backup_day_of_year:
+                file_name = file_prefix + "-YEARLY" + file_type
+                if os.path.exists(file_name):
+                    print("%s already exists. Skipping..." % file_name)
+                else:
+                    create_backup(backup_item, file_name)
 
         # Check for old backups
         backups = os.listdir(backup_item.destination)
@@ -38,29 +72,38 @@ def main():
         backups_monthly = []
         backups_yearly = []
 
-        if backup_item.compression == "bz2":
-            backup_file_type = ".tar.bz2"
-        else:
-            backup_file_type = ".tar.gz"
-
         for str_ in backups:
-            if re.match("\d{4}-\d{2}-\d{2}-DAILY" + backup_file_type, str_):
+            if re.match("\d{4}-\d{2}-\d{2}-DAILY" + file_type, str_):
                 backups_daily.append(str_)
                 continue
 
-            if re.match("\d{4}-\d{2}-\d{2}-WEEKLY" + backup_file_type, str_):
+            if re.match("\d{4}-\d{2}-\d{2}-WEEKLY" + file_type, str_):
                 backups_weekly.append(str_)
                 continue
 
-            if re.match("\d{4}-\d{2}-\d{2}-MONTHLY" + backup_file_type, str_):
+            if re.match("\d{4}-\d{2}-\d{2}-MONTHLY" + file_type, str_):
                 backups_monthly.append(str_)
                 continue
 
-            if re.match("\d{4}-\d{2}-\d{2}-YEARLY" + backup_file_type, str_):
+            if re.match("\d{4}-\d{2}-\d{2}-YEARLY" + file_type, str_):
                 backups_yearly.append(str_)
                 continue
 
         # TODO: Check for overhang and delete it
+
+
+def create_backup(backup_item, file_name):
+    print("Creating backup for %s. Filename: %s" % (backup_item.source, file_name))
+
+    if backup_item.compression == "bz2":
+        mode = "w:bz2"
+    else:
+        mode = "w:gz"
+
+    file_name = os.path.normpath(os.path.join(backup_item.destination, file_name))
+
+    with tarfile.open(file_name, mode) as tar:
+        tar.add(backup_item.source, arcname=os.path.basename(backup_item.source))
 
 
 class Config:
