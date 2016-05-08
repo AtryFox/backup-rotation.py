@@ -13,7 +13,7 @@ def main():
     # Load configuration
     if len(sys.argv) < 2:
         print("No configfile stated, using default (./config.json)")
-        config_path = "default_config.json"
+        config_path = "config.json"
     else:
         if not os.path.isfile(sys.argv[1]):
             print("Stated configfile not found, aborting...")
@@ -23,6 +23,8 @@ def main():
     config_data = Config(config_path)
 
     now = datetime.now()
+
+    print(now.timetuple().tm_wday)
 
     # Start rotation for every backup item
     for backup_item in config_data.backup_items:
@@ -41,7 +43,7 @@ def main():
                 create_backup(backup_item, file_name)
 
         if backup_item.weekly_backups > 0:
-            if now.weekday() == backup_item.create_backup_day_of_week:
+            if now.timetuple().tm_wday == backup_item.create_backup_day_of_week:
                 file_name = file_prefix + "-WEEKLY" + file_type
                 if os.path.exists(file_name):
                     print("%s already exists. Skipping..." % file_name)
@@ -49,7 +51,7 @@ def main():
                     create_backup(backup_item, file_name)
 
         if backup_item.monthly_backups > 0:
-            if now.day == backup_item.create_backup_day_of_month:
+            if now.timetuple().tm_mday == backup_item.create_backup_day_of_month:
                 file_name = file_prefix + "-MONTHLY" + file_type
                 if os.path.exists(file_name):
                     print("%s already exists. Skipping..." % file_name)
