@@ -34,6 +34,8 @@ def main():
         print("Starting backup routine for %s..." % backup_item.source)
         if backup_item.compression == "bz2":
             file_type = ".tar.bz2"
+        elif backup_item.compression == "xz":
+            file_type = ".tar.xz"
         else:
             file_type = ".tar.gz"
 
@@ -134,6 +136,8 @@ def create_backup(backup_item, file_name):
 
     if backup_item.compression == "bz2":
         mode = "w:bz2"
+    elif backup_item.compression == "xz":
+        mode = "w:xz"
     else:
         mode = "w:gz"
 
