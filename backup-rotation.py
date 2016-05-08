@@ -10,13 +10,12 @@ from datetime import datetime
 def main():
     if len(sys.argv) < 2:
         print("No configfile stated, using default (./config.json)")
-        config_path = "config.json"
+        config_path = "default_config.json"
     else:
+        if not os.path.isfile(sys.argv[1]):
+            print("Stated configfile not found, aborting...")
+            exit()
         config_path = sys.argv[1]
-
-    if not os.path.isfile(sys.argv[1]):
-        print("Stated configfile not found, aborting...")
-        exit()
 
     config_data = Config(config_path)
 
@@ -26,38 +25,42 @@ def main():
 class Config:
     def __init__(self, config_path):
         print(config_path)
-        with open(config_path) as config_file:
-            data = json.load(config_file)
+        try:
+            with open(config_path) as config_file:
+                data = json.load(config_file)
 
-            if "default" in data:
-                if "create_backup_day_of_week" in data["default"]:
-                    self.create_backup_day_of_week = data["default"]["create_backup_day_of_week"]
+                if "default" in data:
+                    if "create_backup_day_of_week" in data["default"]:
+                        self.create_backup_day_of_week = data["default"]["create_backup_day_of_week"]
 
-                if "create_backup_day_of_month" in data["default"]:
-                    self.create_backup_day_of_month = data["default"]["create_backup_day_of_month"]
+                    if "create_backup_day_of_month" in data["default"]:
+                        self.create_backup_day_of_month = data["default"]["create_backup_day_of_month"]
 
-                if "create_backup_day_of_year" in data["default"]:
-                    self.create_backup_day_of_year = data["default"]["create_backup_day_of_year"]
+                    if "create_backup_day_of_year" in data["default"]:
+                        self.create_backup_day_of_year = data["default"]["create_backup_day_of_year"]
 
-                if "daily_backups" in data["default"]:
-                    self.daily_backups = data["default"]["daily_backups"]
+                    if "daily_backups" in data["default"]:
+                        self.daily_backups = data["default"]["daily_backups"]
 
-                if "weekly_backups" in data["default"]:
-                    self.weekly_backups = data["default"]["weekly_backups"]
+                    if "weekly_backups" in data["default"]:
+                        self.weekly_backups = data["default"]["weekly_backups"]
 
-                if "monthly_backups" in data["default"]:
-                    self.monthly_backups = data["default"]["monthly_backups"]
+                    if "monthly_backups" in data["default"]:
+                        self.monthly_backups = data["default"]["monthly_backups"]
 
-                if "yearly_backups" in data["default"]:
-                    self.yearly_backups = data["default"]["yearly_backups"]
+                    if "yearly_backups" in data["default"]:
+                        self.yearly_backups = data["default"]["yearly_backups"]
 
-                if "backup_items" in data:
-                    for backups in data["backup_items"]:
-                        if os.path.isdir(backups["source"]) & os.path.isdir(backups["source"]):
-                            self.backup_items.append(BackupItem(self, backups))
+                    if "backup_items" in data:
+                        for backups in data["backup_items"]:
+                            if os.path.isdir(backups["source"]) & os.path.isdir(backups["source"]):
+                                self.backup_items.append(BackupItem(self, backups))
 
-                for test in self.backup_items:
-                    print("%s: %s" % (test.source, test.daily_backups))
+                    for test in self.backup_items:
+                        print("%s: %s" % (test.source, test.daily_backups))
+        except FileNotFoundError:
+            print("Could not find config file!")
+            exit()
 
     create_backup_day_of_week = 0
     create_backup_day_of_month = 0
@@ -136,10 +139,8 @@ class BackupItem:
 
     compression = None
 
-
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("")
-        pass
+        print("Aborting...")
