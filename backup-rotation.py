@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 def main():
-    print("backup-rotation.py v0.1.0")
+    print("backup-rotation.py v0.2.0")
 
     # Load configuration
     if len(sys.argv) < 2:
@@ -21,6 +21,8 @@ def main():
             print("Stated configfile not found, aborting...")
             exit()
         config_path = sys.argv[1]
+
+    print("Configuration loaded: %s" % config_path)
 
     config_data = Config(config_path)
 
@@ -40,34 +42,22 @@ def main():
         # Create backups if necessary
         if backup_item.daily_backups > 0:
             file_name = file_prefix + "-DAILY" + file_type
-            if os.path.exists(file_name):
-                print("%s already exists. Skipping..." % file_name)
-            else:
-                create_backup(backup_item, file_name)
+            create_backup(backup_item, file_name)
 
         if backup_item.weekly_backups > 0:
             if now.timetuple().tm_wday == backup_item.create_backup_day_of_week:
                 file_name = file_prefix + "-WEEKLY" + file_type
-                if os.path.exists(file_name):
-                    print("%s already exists. Skipping..." % file_name)
-                else:
-                    create_backup(backup_item, file_name)
+                create_backup(backup_item, file_name)
 
         if backup_item.monthly_backups > 0:
             if now.timetuple().tm_mday == backup_item.create_backup_day_of_month:
                 file_name = file_prefix + "-MONTHLY" + file_type
-                if os.path.exists(file_name):
-                    print("%s already exists. Skipping..." % file_name)
-                else:
-                    create_backup(backup_item, file_name)
+                create_backup(backup_item, file_name)
 
         if backup_item.yearly_backups > 0:
             if now.timetuple().tm_yday == backup_item.create_backup_day_of_year:
                 file_name = file_prefix + "-YEARLY" + file_type
-                if os.path.exists(file_name):
-                    print("%s already exists. Skipping..." % file_name)
-                else:
-                    create_backup(backup_item, file_name)
+                create_backup(backup_item, file_name)
 
         # Check for old backups
         backups = os.listdir(backup_item.destination)
@@ -79,19 +69,19 @@ def main():
 
         for str_ in backups:
             if re.match("\d{4}-\d{2}-\d{2}-DAILY" + file_type, str_):
-                backups_daily.append(str_)
+                backups_daily.append(os.path.normpath(os.path.join(backup_item.destination, str_)))
                 continue
 
             if re.match("\d{4}-\d{2}-\d{2}-WEEKLY" + file_type, str_):
-                backups_weekly.append(str_)
+                backups_weekly.append(os.path.normpath(os.path.join(backup_item.destination, str_)))
                 continue
 
             if re.match("\d{4}-\d{2}-\d{2}-MONTHLY" + file_type, str_):
-                backups_monthly.append(str_)
+                backups_monthly.append(os.path.normpath(os.path.join(backup_item.destination, str_)))
                 continue
 
             if re.match("\d{4}-\d{2}-\d{2}-YEARLY" + file_type, str_):
-                backups_yearly.append(str_)
+                backups_yearly.append(os.path.normpath(os.path.join(backup_item.destination, str_)))
                 continue
 
         # Check for overhang in old backups and delete it
@@ -102,7 +92,7 @@ def main():
             print("Overhang found (daily backups). Deleting %s old backup(s)..." % overhang)
 
             for i in range(0, overhang):
-                print("Deleting %s..." % backups[i])
+                print("Deleting %s..." % os.path.basename(backups[i]))
                 os.remove(backups[i])
 
         if len(backups_weekly) > backup_item.weekly_backups:
@@ -112,7 +102,7 @@ def main():
             print("Overhang found (weekly backups). Deleting %s old backup(s)..." % overhang)
 
             for i in range(0, overhang):
-                print("Deleting %s..." % backups[i])
+                print("Deleting %s..." % os.path.basename(backups[i]))
                 os.remove(backups[i])
 
         if len(backups_monthly) > backup_item.monthly_backups:
@@ -122,7 +112,7 @@ def main():
             print("Overhang found (monthly backups). Deleting %s old backup(s)..." % overhang)
 
             for i in range(0, overhang):
-                print("Deleting %s..." % backups[i])
+                print("Deleting %s..." % os.path.basename(backups[i]))
                 os.remove(backups[i])
 
         if len(backups_yearly) > backup_item.yearly_backups:
@@ -132,8 +122,11 @@ def main():
             print("Overhang found (yearly backups). Deleting %s old backup(s)..." % overhang)
 
             for i in range(0, overhang):
-                print("Deleting %s..." % backups[i])
+                print("Deleting %s..." % os.path.basename(backups[i]))
                 os.remove(backups[i])
+
+    print()
+    print("Backup rotation finished.")
 
 
 def create_backup(backup_item, file_name):
@@ -144,9 +137,13 @@ def create_backup(backup_item, file_name):
     else:
         mode = "w:gz"
 
-    file_name = os.path.normpath(os.path.join(backup_item.destination, file_name))
+    file_path = os.path.normpath(os.path.join(backup_item.destination, file_name))
 
-    with tarfile.open(file_name, mode) as tar:
+    if os.path.exists(file_path):
+        print("   %s already exists. Skipping..." % file_name)
+        return
+
+    with tarfile.open(file_path, mode) as tar:
         tar.add(backup_item.source, arcname=os.path.basename(backup_item.source))
 
 
