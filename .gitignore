@@ -1,2 +1,9 @@
+# JetBrains PyCharm project folder
 .idea/
+
+# Visual Studio Code project folder
+.vscode/
+
+# Test files
 test_config.json
+*.tar.*

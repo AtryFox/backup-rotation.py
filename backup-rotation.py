@@ -4,10 +4,12 @@
 import os
 import sys
 import json
+import re
 from datetime import datetime
 
 
 def main():
+    # Load configuration
     if len(sys.argv) < 2:
         print("No configfile stated, using default (./config.json)")
         config_path = "config.json"
@@ -21,6 +23,46 @@ def main():
     config_data = Config(config_path)
 
     now = datetime.now()
+
+    # Start rotation for every backupitem
+    for backup_item in config_data.backup_items:
+        # TODO: Create daily backup if necessary
+        # TODO: Create weekly backup if necessary
+        # TODO: Create monthly backup if necessary
+        # TODO: Create yearly backup if necessary
+
+        # Check for old backups
+        backups = os.listdir(backup_item.destination)
+
+        backups_daily = []
+        backups_weekly = []
+        backups_monthly = []
+        backups_yearly = []
+
+        if backup_item.compression == "bz2":
+            backup_file_type = ".tar.bz2"
+        else:
+            backup_file_type = ".tar.gz"
+
+        for str_ in backups:
+            if re.match("\d{4}-\d{2}-\d{2}-DAILY" + backup_file_type, str_):
+                backups_daily.append(str_)
+                continue
+
+            if re.match("\d{4}-\d{2}-\d{2}-WEEKLY" + backup_file_type, str_):
+                backups_weekly.append(str_)
+                print(str_)
+                continue
+
+            if re.match("\d{4}-\d{2}-\d{2}-MONTHLY" + backup_file_type, str_):
+                backups_monthly.append(str_)
+                continue
+
+            if re.match("\d{4}-\d{2}-\d{2}-YEARLY" + backup_file_type, str_):
+                backups_yearly.append(str_)
+                continue
+
+        # TODO: Check for overhang and delete it
 
 
 class Config:
@@ -51,13 +93,13 @@ class Config:
                 if "yearly_backups" in data["default"]:
                     self.yearly_backups = data["default"]["yearly_backups"]
 
+                if "compression" in data["compression"]:
+                    self.compression = data["default"]["compression"]
+
                 if "backup_items" in data:
                     for backups in data["backup_items"]:
                         if os.path.isdir(backups["source"]) & os.path.isdir(backups["source"]):
                             self.backup_items.append(BackupItem(self, backups))
-
-                for test in self.backup_items:
-                    print("%s: %s" % (test.source, test.daily_backups))
 
     create_backup_day_of_week = 0
     create_backup_day_of_month = 0
