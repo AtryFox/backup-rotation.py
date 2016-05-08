@@ -10,6 +10,8 @@ from datetime import datetime
 
 
 def main():
+    print("backup-rotation.py v0.1.0")
+
     # Load configuration
     if len(sys.argv) < 2:
         print("No configfile stated, using default (./config.json)")
@@ -24,10 +26,10 @@ def main():
 
     now = datetime.now()
 
-    print(now.timetuple().tm_wday)
-
     # Start rotation for every backup item
     for backup_item in config_data.backup_items:
+        print()
+        print("Starting backup routine for %s..." % backup_item.source)
         if backup_item.compression == "bz2":
             file_type = ".tar.bz2"
         else:
@@ -35,6 +37,7 @@ def main():
 
         file_prefix = now.strftime("%Y-%m-%d")
 
+        # Create backups if necessary
         if backup_item.daily_backups > 0:
             file_name = file_prefix + "-DAILY" + file_type
             if os.path.exists(file_name):
@@ -91,11 +94,50 @@ def main():
                 backups_yearly.append(str_)
                 continue
 
-        # TODO: Check for overhang and delete it
+        # Check for overhang in old backups and delete it
+        if len(backups_daily) > backup_item.daily_backups:
+            overhang = len(backups_daily) - backup_item.daily_backups
+            backups = sorted(backups_daily, key=os.path.getctime)
+
+            print("Overhang found (daily backups). Deleting %s old backup(s)..." % overhang)
+
+            for i in range(0, overhang):
+                print("Deleting %s..." % backups[i])
+                os.remove(backups[i])
+
+        if len(backups_weekly) > backup_item.weekly_backups:
+            overhang = len(backups_weekly) - backup_item.weekly_backups
+            backups = sorted(backups_weekly, key=os.path.getctime)
+
+            print("Overhang found (weekly backups). Deleting %s old backup(s)..." % overhang)
+
+            for i in range(0, overhang):
+                print("Deleting %s..." % backups[i])
+                os.remove(backups[i])
+
+        if len(backups_monthly) > backup_item.monthly_backups:
+            overhang = len(backups_monthly) - backup_item.monthly_backups
+            backups = sorted(backups_monthly, key=os.path.getctime)
+
+            print("Overhang found (monthly backups). Deleting %s old backup(s)..." % overhang)
+
+            for i in range(0, overhang):
+                print("Deleting %s..." % backups[i])
+                os.remove(backups[i])
+
+        if len(backups_yearly) > backup_item.yearly_backups:
+            overhang = len(backups_yearly) - backup_item.yearly_backups
+            backups = sorted(backups_yearly, key=os.path.getctime)
+
+            print("Overhang found (yearly backups). Deleting %s old backup(s)..." % overhang)
+
+            for i in range(0, overhang):
+                print("Deleting %s..." % backups[i])
+                os.remove(backups[i])
 
 
 def create_backup(backup_item, file_name):
-    print("Creating backup for %s. Filename: %s" % (backup_item.source, file_name))
+    print("Creating backup... Filename: %s" % file_name)
 
     if backup_item.compression == "bz2":
         mode = "w:bz2"
@@ -157,7 +199,7 @@ class Config:
     monthly_backups = 6
     yearly_backups = 4
 
-    compression = "bz2"
+    compression = "gz"
 
     backup_items = []
 
