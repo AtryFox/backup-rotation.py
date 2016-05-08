@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 def main():
-    print("backup-rotation.py v0.2.0")
+    print("backup-rotation.py v0.3.0")
 
     # Load configuration
     if len(sys.argv) < 2:
@@ -147,8 +147,73 @@ def create_backup(backup_item, file_name):
         print("   %s already exists. Skipping..." % file_name)
         return
 
-    with tarfile.open(file_path, mode) as tar:
-        tar.add(backup_item.source, arcname=os.path.basename(backup_item.source))
+    tar = tarfile.open(file_path, mode)
+    add(tar, backup_item.source, arcname=os.path.basename(backup_item.source))
+    tar.close()
+
+
+# modified copy of tarfile.add (https://hg.python.org/cpython/file/v3.5.1/Lib/tarfile.py)
+def add(self, name, arcname=None, recursive=True, exclude=None, *, filter=None):
+    self._check("aw")
+
+    if arcname is None:
+        arcname = name
+
+    # Exclude pathnames.
+    if exclude is not None:
+        import warnings
+        warnings.warn("use the filter argument instead",
+                      DeprecationWarning, 2)
+        if exclude(name):
+            self._dbg(2, "tarfile: Excluded %r" % name)
+            return
+
+    # Skip if somebody tries to archive the archive...
+    if self.name is not None and os.path.abspath(name) == self.name:
+        self._dbg(2, "tarfile: Skipped %r" % name)
+        return
+
+    self._dbg(1, name)
+
+    # Create a TarInfo object from the file.
+    tarinfo = self.gettarinfo(name, arcname)
+
+    if tarinfo is None:
+        self._dbg(1, "tarfile: Unsupported type %r" % name)
+        return
+
+    # Change or exclude the TarInfo object.
+    if filter is not None:
+        tarinfo = filter(tarinfo)
+        if tarinfo is None:
+            self._dbg(2, "tarfile: Excluded %r" % name)
+            return
+
+    bltn_open = self.open
+
+    # Append the tar header and data to the archive.
+    if tarinfo.isreg():
+        with bltn_open(name, "rb") as f:
+            try:
+                self.addfile(tarinfo, f)
+            except Exception as e:
+                print("   An error occurred: %s" % e.strerror)
+
+    elif tarinfo.isdir():
+        self.addfile(tarinfo)
+        if recursive:
+            for f in os.listdir(name):
+                try:
+                    self.add(os.path.join(name, f), os.path.join(arcname, f),
+                             recursive, exclude, filter=filter)
+                except Exception as e:
+                    print("   An error occurred: %s" % e.strerror)
+
+    else:
+        try:
+            self.addfile(tarinfo)
+        except Exception as e:
+            print("   An error occurred: %s" % e.strerror)
 
 
 class Config:
@@ -200,7 +265,7 @@ class Config:
     monthly_backups = 6
     yearly_backups = 4
 
-    compression = "gz"
+    compression = "xz"
 
     backup_items = []
 
