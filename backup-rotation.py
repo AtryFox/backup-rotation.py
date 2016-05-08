@@ -10,7 +10,7 @@ from datetime import datetime
 def main():
     if len(sys.argv) < 2:
         print("No configfile stated, using default (./config.json)")
-        config_path = "config.json"
+        config_path = "default_config.json"
     else:
         if not os.path.isfile(sys.argv[1]):
             print("Stated configfile not found, aborting...")
@@ -139,10 +139,8 @@ class BackupItem:
 
     compression = None
 
-
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("")
-        pass
+        print("Aborting...")
