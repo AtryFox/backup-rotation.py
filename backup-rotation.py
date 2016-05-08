@@ -180,7 +180,7 @@ class Config:
 
                     if "backup_items" in data:
                         for backups in data["backup_items"]:
-                            if os.path.isdir(backups["source"]) & os.path.isdir(backups["source"]):
+                            if os.path.isdir(backups["source"]) & os.path.isdir(backups["destination"]):
                                 self.backup_items.append(BackupItem(self, backups))
 
         except FileNotFoundError:
