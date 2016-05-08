@@ -60,7 +60,7 @@ def main():
                 backups_yearly.append(str_)
                 continue
 
-                # TODO: Check for overhang and delete it
+        # TODO: Check for overhang and delete it
 
 
 class Config:
