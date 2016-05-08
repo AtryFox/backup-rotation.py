@@ -50,7 +50,6 @@ def main():
 
             if re.match("\d{4}-\d{2}-\d{2}-WEEKLY" + backup_file_type, str_):
                 backups_weekly.append(str_)
-                print(str_)
                 continue
 
             if re.match("\d{4}-\d{2}-\d{2}-MONTHLY" + backup_file_type, str_):
@@ -61,12 +60,11 @@ def main():
                 backups_yearly.append(str_)
                 continue
 
-        # TODO: Check for overhang and delete it
+                # TODO: Check for overhang and delete it
 
 
 class Config:
     def __init__(self, config_path):
-        print(config_path)
         try:
             with open(config_path) as config_file:
                 data = json.load(config_file)
@@ -93,7 +91,7 @@ class Config:
                     if "yearly_backups" in data["default"]:
                         self.yearly_backups = data["default"]["yearly_backups"]
 
-                    if "compression" in data["compression"]:
+                    if "compression" in data["default"]:
                         self.compression = data["default"]["compression"]
 
                     if "backup_items" in data:
@@ -101,8 +99,6 @@ class Config:
                             if os.path.isdir(backups["source"]) & os.path.isdir(backups["source"]):
                                 self.backup_items.append(BackupItem(self, backups))
 
-                    for test in self.backup_items:
-                        print("%s: %s" % (test.source, test.daily_backups))
         except FileNotFoundError:
             print("Could not find config file!")
             exit()
