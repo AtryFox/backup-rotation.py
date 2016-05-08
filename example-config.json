@@ -1,0 +1,36 @@
+{
+  "default": {
+    "create_backup_day_of_week": 0,
+    "create_backup_day_of_month": 15,
+    "create_backup_day_of_year": 60,
+    "daily_backups": 7,
+    "weekly_backups": 4,
+    "monthly_backups": 6,
+    "yearly_backups": 4,
+    "compression": "gz"
+  },
+  "backup_items": [
+    {
+      "source": "/home/media/movies",
+      "destination": "/media/movie_backups",
+      "daily_backups": 2,
+      "weekly_backups": 0,
+      "monthly_backups": 1,
+      "yearly_backups": 3
+    },
+    {
+      "source": "/home/foo/bar",
+      "destination": "/home/foo",
+      "daily_backups": 3,
+      "weekly_backups": 8,
+      "compression": "xz"
+    },
+    {
+      "source": "/var/www/webpage",
+      "destination": "/home/foo/backups",
+      "create_backup_day_of_week": 6,
+      "weekly_backups": 8,
+      "compression": "bz2"
+    }
+  ]
+}
