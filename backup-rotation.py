@@ -9,7 +9,7 @@ import tarfile
 from datetime import datetime
 from collections import defaultdict
 
-__version__ = "v0.4.0"
+__version__ = "v1.0.0-rc1"
 
 
 # modified copy of tarfile.add (https://hg.python.org/cpython/file/v3.5.1/Lib/tarfile.py)
@@ -87,9 +87,8 @@ def create_backup(backup_item, file_name):
         print("   %s already exists. Skipping..." % file_name)
         return
 
-    tar = tarfile.open(file_path, mode)
-    add(tar, backup_item["source"], arcname=os.path.basename(backup_item["source"]))
-    tar.close()
+    with tarfile.open(file_path, mode) as tar:
+        add(tar, backup_item["source"], arcname=os.path.basename(backup_item["source"]))
 
 
 def load_config(config_path):
@@ -133,7 +132,7 @@ def load_config(config_path):
 
 
 def main():
-    print("backup-rotation.py ", __version__)
+    print("backup-rotation.py", __version__)
 
     # Load configuration
     if len(sys.argv) < 2:
@@ -162,25 +161,34 @@ def main():
 
         file_prefix = now.strftime("%Y-%m-%d")
 
+        no_backups_created = True
+
         # Create backups if necessary
         if backup_item["daily_backups"] > 0:
             file_name = file_prefix + "-DAILY" + file_extension
             create_backup(backup_item, file_name)
+            no_backups_created = False
 
         if backup_item["weekly_backups"] > 0:
             if now.timetuple().tm_wday == backup_item["create_backup_day_of_week"]:
                 file_name = file_prefix + "-WEEKLY" + file_extension
                 create_backup(backup_item, file_name)
+                no_backups_created = False
 
         if backup_item["monthly_backups"] > 0:
             if now.timetuple().tm_mday == backup_item["create_backup_day_of_month"]:
                 file_name = file_prefix + "-MONTHLY" + file_extension
                 create_backup(backup_item, file_name)
+                no_backups_created = False
 
         if backup_item["yearly_backups"] > 0:
             if now.timetuple().tm_yday == backup_item["create_backup_day_of_year"]:
                 file_name = file_prefix + "-YEARLY" + file_extension
                 create_backup(backup_item, file_name)
+                no_backups_created = False
+
+        if no_backups_created:
+            print("No backups created.")
 
         # Check for old backups
         backups = os.listdir(backup_item["destination"])
