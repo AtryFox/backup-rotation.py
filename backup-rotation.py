@@ -99,8 +99,8 @@ def load_config(config_path):
 
     result["default"] = {
         'create_backup_day_of_week': 0,
-        'create_backup_day_of_month': 0,
-        'create_backup_day_of_year': 0,
+        'create_backup_day_of_month': 1,
+        'create_backup_day_of_year': 1,
 
         'daily_backups': 7,
         'weekly_backups': 4,
