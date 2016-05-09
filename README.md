@@ -13,22 +13,22 @@ Simple Python 3 script for rotating your backups.
 - Python 3
 
 ## Installation ##
-1. Download the `backup-rotation.py` on your server and create a [configuration file](#configuration) .
-```
-wget https://raw.githubusercontent.com/DerAtrox/backup-rotation.py/master/backup-rotation.py
-```
+1. Download the `backup-rotation.py` on your server and create a [configuration file](#configuration).
+
+		wget https://raw.githubusercontent.com/DerAtrox/backup-rotation.py/master/backup-rotation.py
+
 2. Test the script and your configuration.
-```
-python3 backup-rotation.py [path to your config.json]
-```
-3. Add a cronjob, so the script runs daily
-```
-crontab -e
-```
-Put the following line into your crontab. This will run the script every day 1 hour after midnight.
-```
-0 1 * * * python3 [path to backup_rotation.py]
-```
+
+		python3 backup-rotation.py [path to your config.json]
+
+3. Add a cronjob, so the script runs daily.
+
+		crontab -e
+
+	Put the following line into your crontab. This will run the script every day 1 hour after midnight.
+
+		0 1 * * * python3 [path to backup_rotation.py]
+
 
 <div id='configuration'>
 ## Configuration ##
@@ -63,5 +63,3 @@ All values inside of the `default`array are used as default values. These values
 
 #### Examples #####
 Check out the `example-config.json` for more config samples.
-
-Info: This project is work in progress. If you want to use `backup-rotation.py`, please wait until the first rc-version of this project is released. Feel free to watch, star or fork this project! 
