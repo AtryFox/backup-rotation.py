@@ -136,13 +136,14 @@ def main():
 
     # Load configuration
     if len(sys.argv) < 2:
-        print("No configfile stated, using default (./config.json)")
-        config_path = "config.json"
+        config_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "config.json"))
+        print("No configfile stated, using default ({0})".format(config_path))
     else:
-        if not os.path.isfile(sys.argv[1]):
-            print("Stated configfile not found, aborting...")
-            exit()
         config_path = sys.argv[1]
+
+    if not os.path.isfile(config_path):
+        print("Stated configfile not found, aborting...")
+        exit()
 
     config_data = load_config(config_path)
     print("Configuration loaded: %s" % config_path)
@@ -199,7 +200,7 @@ def main():
             match = re.match("\d{4}-\d{2}-\d{2}-(DAILY|WEEKLY|MONTHLY|YEARLY)" + re.escape(file_extension), str_)
 
             if match:
-                old_backups[match.group(1)].append(str_)
+                old_backups[match.group(1)].append(os.path.normpath(os.path.join(backup_item["destination"], str_)))
 
         # Check for overhang in old backups and delete it
         for period_name, max_backups in [
