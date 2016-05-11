@@ -164,29 +164,19 @@ def main():
 
         no_backups_created = True
 
-        # Create backups if necessary
-        if backup_item["daily_backups"] > 0:
-            file_name = file_prefix + "-DAILY" + file_extension
-            create_backup(backup_item, file_name)
-            no_backups_created = False
+        timetuple = now.timetuple()
 
-        if backup_item["weekly_backups"] > 0:
-            if now.timetuple().tm_wday == backup_item["create_backup_day_of_week"]:
-                file_name = file_prefix + "-WEEKLY" + file_extension
-                create_backup(backup_item, file_name)
-                no_backups_created = False
-
-        if backup_item["monthly_backups"] > 0:
-            if now.timetuple().tm_mday == backup_item["create_backup_day_of_month"]:
-                file_name = file_prefix + "-MONTHLY" + file_extension
-                create_backup(backup_item, file_name)
-                no_backups_created = False
-
-        if backup_item["yearly_backups"] > 0:
-            if now.timetuple().tm_yday == backup_item["create_backup_day_of_year"]:
-                file_name = file_prefix + "-YEARLY" + file_extension
-                create_backup(backup_item, file_name)
-                no_backups_created = False
+        for max_backups, current_date, backup_date, period_name in [
+            (backup_item["daily_backups"], None, None, "DAILY"),
+            (backup_item["weekly_backups"], timetuple.tm_wday, backup_item["create_backup_day_of_week"], "WEEKLY"),
+            (backup_item["monthly_backups"], timetuple.tm_mday, backup_item["create_backup_day_of_month"], "MONTHLY"),
+            (backup_item["yearly_backups"], timetuple.tm_yday, backup_item["create_backup_day_of_year"], "YEARLY")
+        ]:
+            if max_backups > 0:
+                if current_date == backup_date:
+                    file_name = file_prefix + "-" + period_name + file_extension
+                    create_backup(backup_item, file_name)
+                    no_backups_created = False
 
         if no_backups_created:
             print("No backups created.")
