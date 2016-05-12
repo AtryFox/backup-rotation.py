@@ -50,7 +50,6 @@ wget https://raw.githubusercontent.com/DerAtrox/backup-rotation.py/master/defaul
 | `monthly_backups`            | `default` and `backup_item` | Count of how many monthly backups to keep                |
 | `yearly_backups`             | `default` and `backup_item` | Count of how many yearly backups to keep                 |
 | `compression`                | `default` and `backup_item` | Compression type (Supported types: `gz`, `xz` and `bz2`) |
-| `backup_items`               | `default`                   | Collection of backup items                              |
 | `source`                     | `backup_item`               | Source directory of backup                               |
 | `destination`                | `backup_item`               | Destination directory of backups                         |
 
