@@ -15,8 +15,8 @@
       "destination": "/media/movie_backups",
       "daily_backups": 2,
       "weekly_backups": 0,
-      "monthly_backups": 1,
-      "yearly_backups": 3
+      "yearly_backups": 3,
+      "create_backup_day_of_month": 7
     },
     {
       "source": "/home/foo/bar",

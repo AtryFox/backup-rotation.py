@@ -9,7 +9,7 @@ import tarfile
 from datetime import datetime
 from collections import defaultdict
 
-__version__ = "v1.0.0-rc1"
+__version__ = "v1.0.0"
 
 
 # modified copy of tarfile.add (https://hg.python.org/cpython/file/v3.5.1/Lib/tarfile.py)

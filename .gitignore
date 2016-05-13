@@ -8,3 +8,4 @@
 test_config.json
 *.tar.*
 test/
+test.py
