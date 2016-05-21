@@ -6,7 +6,7 @@ Simple Python 3 script for rotating your backups.
 - [x] Create backups/backup rotations of multiple directories
 - [x] Define different settings for every backup source
 - [x] Support for diffrent compression methods
-- [ ] Logging / Mailing support
+- [ ] Logging and logrotation
 
 
 ## Requirements ##
