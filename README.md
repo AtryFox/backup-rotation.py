@@ -38,8 +38,8 @@ You can use some parameters to create log files or disable console output.
 | Parameter     | Description                                                        | Default                           |
 |:--------------|:-------------------------------------------------------------------|:----------------------------------|
 | `-c <path>`   | `<path>` to your configuration file                                | config.json in the same directory |
-| `-l <path>`   | `<path>` to your logfile (default: no logfile)                     | no log output                     |
-| `-lv <level>` | Specifies the [loglevel](#loglevels) for your logfile (default: 1) | 1                                 |
+| `-l <path>`   | `<path>` to your logfile                                           | no log output                     |
+| `-lv <level>` | Specifies the [loglevel](#loglevels) for your logfile              | 1                                 |
 | `-q`          | Quite, no console output                                           |                                   |
 
 
