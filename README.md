@@ -6,7 +6,7 @@ Simple Python 3 script for rotating your backups.
 - [x] Create backups/backup rotations of multiple directories
 - [x] Define different settings for every backup source
 - [x] Support for diffrent compression methods
-- [ ] Logging and logrotation
+- [x] Logging
 
 
 ## Requirements ##
@@ -19,7 +19,7 @@ Simple Python 3 script for rotating your backups.
 
 2. Test the script and your configuration.
 
-		python3 backup-rotation.py [path to your config.json]
+		python3 backup-rotation.py -c [path to your config.json]
 
 3. Add a cronjob, so the script runs daily.
 
@@ -27,11 +27,28 @@ Simple Python 3 script for rotating your backups.
 
 	Put the following line into your crontab. This will run the script every day 1 hour after midnight.
 
-		0 1 * * * python3 [path to backup_rotation.py]
+		0 1 * * * python3 -c [path to backup_rotation.py] -q
 
-	Want some log output? Just change your crontab to: 
-	
-		0 1 * * * python3 [path to backup_rotation.py] > [path to desired backup_rotation.log]
+	Want some log files? Check out our [parameters](#parameters).
+
+<div id='configuration'>
+## Parameters ##
+You can use some parameters to create log files or disable console output.
+
+| Parameter     | Description                                                        | Default                           |
+|:--------------|:-------------------------------------------------------------------|:----------------------------------|
+| `-c <path>`   | `<path>` to your configuration file                                | config.json in the same directory |
+| `-l <path>`   | `<path>` to your logfile (default: no logfile)                     | no log output                     |
+| `-lv <level>` | Specifies the [loglevel](#loglevels) for your logfile (default: 1) | 1                                 |
+| `-q`          | Quite, no console output                                           |                                   |
+
+
+<div id='loglevels'>
+#### Loglevels ####
+- Loglevel `0`: Debug messages
+- Loglevel `1`: Generic information
+- Loglevel `2`: Warnings (e.g. backupitem invalid)
+- Loglevel `3`: Errors (e.g. config not found)
 
 
 <div id='configuration'>
