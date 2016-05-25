@@ -20,9 +20,13 @@ class Log(object):
 
     def __init__(self, filename, log_level_file, log_level_console):
         if filename != "":
-            self.log_file = codecs.open(filename, "a+", "utf-8")
-            self.log_file_opened = True
-            self.log_level_file = log_level_file
+            try:
+                self.log_file = codecs.open(filename, "a+", "utf-8")
+                self.log_file_opened = True
+                self.log_level_file = log_level_file
+            except PermissionError as e:
+                self.log_level_file = 4
+                self.log("Could not open logfile! {0}".format(e), 3)
         else:
             self.log_level_file = 4
 
@@ -47,7 +51,7 @@ class Log(object):
 
 
 class BackupRotation(object):
-    __version__ = "v1.1.1"
+    __version__ = "v1.1.2"
 
     def __init__(self):
         config_path = os.path.normpath(os.path.join(os.path.dirname(__file__), "config.json"))
@@ -105,8 +109,7 @@ class BackupRotation(object):
         for max_backups, current_date, backup_date, period_name in [
             (backup_item["daily_backups"], None, None, "DAILY"),
             (backup_item["weekly_backups"], timetuple.tm_wday, backup_item["create_backup_day_of_week"], "WEEKLY"),
-            (backup_item["monthly_backups"], timetuple.tm_mday, backup_item["create_backup_day_of_month"],
-             "MONTHLY"),
+            (backup_item["monthly_backups"], timetuple.tm_mday, backup_item["create_backup_day_of_month"], "MONTHLY"),
             (backup_item["yearly_backups"], timetuple.tm_yday, backup_item["create_backup_day_of_year"], "YEARLY")
         ]:
             if max_backups > 0:
