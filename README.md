@@ -31,7 +31,7 @@ Simple Python 3 script for rotating your backups.
 
 	Want some log files? Check out our [parameters](#parameters).
 
-<div id='configuration'>
+<div id='parameters'></div>
 ## Parameters ##
 You can use some parameters to create log files or disable console output.
 
@@ -43,7 +43,7 @@ You can use some parameters to create log files or disable console output.
 | `-q`          | Quite, no console output                                           |                                   |
 
 
-<div id='loglevels'>
+<div id='loglevels'></div>
 #### Loglevels ####
 - Loglevel `0`: Debug messages
 - Loglevel `1`: Generic information
@@ -51,7 +51,7 @@ You can use some parameters to create log files or disable console output.
 - Loglevel `3`: Errors (e.g. config not found)
 
 
-<div id='configuration'>
+<div id='configuration'></div>
 ## Configuration ##
 The configuration of `backup-rotation.py` is stored in a *.json*-file. To get started, just copy or download the `default-config.json` on your server.
 ```
